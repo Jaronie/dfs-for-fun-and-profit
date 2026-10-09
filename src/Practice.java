@@ -1,3 +1,6 @@
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -18,6 +21,25 @@ public class Practice {
    * @param vertex The starting vertex for the traversal.
    */
   public <T> void printVertexVals(Vertex<T> vertex) {
+    Set<Vertex<?>> visited = new HashSet<>();
+    printVertexVals(vertex, visited);
+  }
+
+  //DFS
+  public static void printVertexVals(Vertex<?> current, Set<Vertex<?>> visited){
+    if(current == null) return;
+    
+    if(visited.contains(current)) return;
+
+    visited.add(current);
+
+    System.out.println(current.data);
+
+    // Recurse over the children
+    for(Vertex<?> neighbor : current.neighbors){
+      printVertexVals(neighbor,visited);
+    }
+
   }
 
   /**
@@ -30,8 +52,30 @@ public class Practice {
    * @return A set containing all reachable vertices, or an empty set if vertex is null.
    */
   public <T> Set<Vertex<T>> reachable(Vertex<T> vertex) {
-    return null;
+    Set<Vertex<T>> visited = new HashSet<>();
+
+    if(vertex == null) return visited;
+
+    Queue<Vertex<T>> queue = new LinkedList<>();
+    queue.add(vertex);
+    visited.add(vertex);
+
+    while(!queue.isEmpty()){
+      Vertex<T> current = queue.poll();
+
+      for(Vertex<T> neighbor : current.neighbors) {
+        if(neighbor != null && visited.add(neighbor)) {
+          queue.add(neighbor);
+        }
+      }
+    }
+
+    return visited;
   }
+  /*
+  Did this in BFS approach
+  */
+
 
   /**
    * Returns the maximum value among all vertices reachable from the given starting vertex,
@@ -43,7 +87,23 @@ public class Practice {
    * @return The maximum value of any reachable vertex, or Integer.MIN_VALUE if vertex is null.
    */
   public int max(Vertex<Integer> vertex) {
-    return -1;
+    if(vertex == null) return Integer.MIN_VALUE;
+
+    return max(vertex, new HashSet<>());
+  }
+
+  public int max(Vertex<Integer> current, Set<Vertex<Integer>> visited){
+    visited.add(current);
+    int max = current.data;
+
+    for(Vertex<Integer> neighbor : current.neighbors){
+
+      if(neighbor != null && !visited.contains(neighbor)){
+        max = Math.max(max, max(neighbor, visited));
+      }
+    }
+
+    return max;
   }
 
   /**
